@@ -10,7 +10,7 @@ model = genai.GenerativeModel("models/gemini-1.5-flash")
 
 # Streamlit app UI
 st.set_page_config(page_title="AI Study Helper", layout="centered")
-st.title("📚 AI Study Helper (Gemini)")
+st.title("📚 AI Study Helper")
 st.caption("Ask any academic question. Get a smart, short answer!")
 
 question = st.text_input("✍️ Enter your question:")
