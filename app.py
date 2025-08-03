@@ -2,49 +2,50 @@ import streamlit as st
 import openai
 from deep_translator import GoogleTranslator
 
-# Load OpenAI API key from Streamlit secrets
+# Load OpenAI API Key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# Streamlit page setup
-st.set_page_config(page_title="AI Study Helper 2.0", layout="centered")
+st.set_page_config(page_title="AI Study Helper", layout="centered")
+
 st.title("📘 AI Study Helper 2.0")
-st.markdown("Ask any question, get a concise answer with optional translation!")
+st.markdown("Ask any question and get a short AI-generated answer, now with Translation!")
 
-# Input fields
-user_input = st.text_input("🔎 Enter your study question:")
-translate_option = st.checkbox("Translate Answer to Bengali 🇧🇩")
+# User input
+question = st.text_input("Enter your study question:")
 
-# Function to call OpenAI
-def get_answer(question):
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # or use "gpt-4" if your key has access
-            messages=[
-                {"role": "system", "content": "You are a helpful AI tutor that explains concisely."},
-                {"role": "user", "content": question},
-            ],
-            temperature=0.5,
-            max_tokens=300
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        return f"⚠️ Error fetching response: {e}"
+# Language choice
+languages = ['None (English)', 'Bangla', 'Hindi', 'Arabic']
+target_language = st.selectbox("Translate answer to:", languages)
 
-# On button click
 if st.button("Get Answer"):
-    if user_input:
-        with st.spinner("🧠 Thinking..."):
-            answer = get_answer(user_input)
-            if translate_option:
-                try:
-                    translated = GoogleTranslator(source='auto', target='bn').translate(answer)
-                    st.markdown("### 📝 Answer (Translated to Bengali):")
-                    st.success(translated)
-                except Exception as te:
-                    st.warning("⚠️ Translation failed. Showing original answer:")
-                    st.info(answer)
-            else:
-                st.markdown("### 📝 Answer:")
-                st.success(answer)
-    else:
+    if not question.strip():
         st.warning("Please enter a question.")
+    else:
+        with st.spinner("Generating answer..."):
+            try:
+                # Get OpenAI answer
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{"role": "user", "content": question}],
+                    max_tokens=150,
+                    temperature=0.5
+                )
+                answer = response['choices'][0]['message']['content']
+
+                # Translate if needed
+                if target_language != 'None (English)':
+                    lang_code = {
+                        'Bangla': 'bn',
+                        'Hindi': 'hi',
+                        'Arabic': 'ar'
+                    }.get(target_language, 'en')
+
+                    translated = GoogleTranslator(source='auto', target=lang_code).translate(answer)
+                    st.markdown("**Translated Answer:**")
+                    st.success(translated)
+                else:
+                    st.markdown("**Answer:**")
+                    st.success(answer)
+
+            except Exception as e:
+                st.error(f"Failed to get response from AI: {e}")
