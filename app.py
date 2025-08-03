@@ -2,8 +2,9 @@ import streamlit as st
 import openai
 from deep_translator import GoogleTranslator
 
-# Load OpenAI API Key
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Set up OpenAI client (new syntax)
+from openai import OpenAI
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 st.set_page_config(page_title="AI Study Helper", layout="centered")
 
@@ -23,14 +24,14 @@ if st.button("Get Answer"):
     else:
         with st.spinner("Generating answer..."):
             try:
-                # Get OpenAI answer
-                response = openai.ChatCompletion.create(
+                # Use new OpenAI SDK format
+                response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "user", "content": question}],
                     max_tokens=150,
                     temperature=0.5
                 )
-                answer = response['choices'][0]['message']['content']
+                answer = response.choices[0].message.content
 
                 # Translate if needed
                 if target_language != 'None (English)':
@@ -48,4 +49,4 @@ if st.button("Get Answer"):
                     st.success(answer)
 
             except Exception as e:
-                st.error(f"Failed to get response from AI: {e}")
+                st.error(f"⚠️ Error fetching response:\n\n{e}")
