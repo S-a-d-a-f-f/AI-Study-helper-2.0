@@ -5,11 +5,10 @@ from deep_translator import GoogleTranslator
 # Load Gemini API Key from secrets
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# Set up the model correctly
-model = genai.GenerativeModel('models/gemini-pro')
+# Use correct model name without "models/"
+model = genai.GenerativeModel("gemini-pro")
 
 st.set_page_config(page_title="AI Study Helper", layout="centered")
-
 st.title("📘 AI Study Helper 2.0")
 st.markdown("Ask any question and get a short AI-generated answer, now with Translation!")
 
@@ -26,11 +25,10 @@ if st.button("Get Answer"):
     else:
         with st.spinner("Generating answer..."):
             try:
-                # Send prompt to Gemini
                 response = model.generate_content(question)
                 answer = response.text.strip()
 
-                # Translate if needed
+                # Translation if selected
                 if target_language != 'None (English)':
                     lang_code = {
                         'Bangla': 'bn',
