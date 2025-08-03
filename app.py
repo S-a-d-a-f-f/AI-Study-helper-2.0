@@ -1,13 +1,13 @@
+
 import streamlit as st
-import openai
 from deep_translator import GoogleTranslator
+import google.generativeai as genai
 
-# Set up OpenAI client (new syntax)
-from openai import OpenAI
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# Set up Gemini API key from Streamlit secrets
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-st.set_page_config(page_title="AI Study Helper", layout="centered")
-
+# Page settings
+st.set_page_config(page_title="AI Study Helper 2.0", layout="centered")
 st.title("📘 AI Study Helper 2.0")
 st.markdown("Ask any question and get a short AI-generated answer, now with Translation!")
 
@@ -24,29 +24,7 @@ if st.button("Get Answer"):
     else:
         with st.spinner("Generating answer..."):
             try:
-                # Use new OpenAI SDK format
-                response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
-                    messages=[{"role": "user", "content": question}],
-                    max_tokens=150,
-                    temperature=0.5
-                )
-                answer = response.choices[0].message.content
-
-                # Translate if needed
-                if target_language != 'None (English)':
-                    lang_code = {
-                        'Bangla': 'bn',
-                        'Hindi': 'hi',
-                        'Arabic': 'ar'
-                    }.get(target_language, 'en')
-
-                    translated = GoogleTranslator(source='auto', target=lang_code).translate(answer)
-                    st.markdown("**Translated Answer:**")
-                    st.success(translated)
-                else:
-                    st.markdown("**Answer:**")
-                    st.success(answer)
-
-            except Exception as e:
-                st.error(f"⚠️ Error fetching response:\n\n{e}")
+                # Use Gemini-Pro model (text-only)
+                model = genai.GenerativeModel("gemini-pro")
+                response = model.generate_content(question)
+                answer = response.text.strip()
