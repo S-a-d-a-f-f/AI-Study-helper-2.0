@@ -2,15 +2,16 @@ import streamlit as st
 import google.generativeai as genai
 from deep_translator import GoogleTranslator
 
-# Set your Gemini API key
+# Load Gemini API Key from secrets
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# Load Gemini model
-model = genai.GenerativeModel("gemini-pro")
+# Set up the model correctly
+model = genai.GenerativeModel('models/gemini-pro')
 
-st.set_page_config(page_title="AI Study Helper 2.0", layout="centered")
+st.set_page_config(page_title="AI Study Helper", layout="centered")
+
 st.title("📘 AI Study Helper 2.0")
-st.markdown("Ask any study question and get a short AI-generated answer. Now with Translation!")
+st.markdown("Ask any question and get a short AI-generated answer, now with Translation!")
 
 # User input
 question = st.text_input("Enter your study question:")
@@ -25,9 +26,11 @@ if st.button("Get Answer"):
     else:
         with st.spinner("Generating answer..."):
             try:
+                # Send prompt to Gemini
                 response = model.generate_content(question)
                 answer = response.text.strip()
 
+                # Translate if needed
                 if target_language != 'None (English)':
                     lang_code = {
                         'Bangla': 'bn',
