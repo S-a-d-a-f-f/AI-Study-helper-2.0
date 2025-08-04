@@ -54,7 +54,7 @@ This version uses Google’s Gemini 1.5 Flash model via their public API. The as
 🌐 Live Demo
 
 Try the app here:
-🔗 https://btkqsgbtjhz8vwjgumqmac.streamlit.app/
+🔗https://ai-study-apper-20-jxvywpqevrjo82h7notdbn.streamlit.app/
 
 
 ---
